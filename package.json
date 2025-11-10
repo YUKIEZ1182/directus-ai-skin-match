@@ -2,6 +2,9 @@
   "name": "directus-ai-skin-match",
   "description": "Custom extensions for the AI Skin Match project",
   "version": "0.1.0",
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "directus",
     "directus-extension",
