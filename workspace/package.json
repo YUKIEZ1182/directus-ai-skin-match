@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@directus/composables": "^9.26.0",
+    "directus": "^9.26.0",
+    "directus-extension-computed-interface": "^1.9.0",
+    "directus-extension-group-tabs-interface": "^1.2.2",
+    "directus-extension-inline-form-interface": "^1.1.0",
+    "directus-extension-schema-management-module": "^1.5.0",
+    "directus-ai-skin-match": "file://../ai-skin-match"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}
