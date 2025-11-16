@@ -1,5 +1,5 @@
 {
-  "name": "directus-ai-skin-match",
+  "name": "directus-extension-ai-skin-match",
   "icon": "extension",
   "version": "1.0.0",
   "keywords": [
@@ -7,40 +7,47 @@
     "directus-extension",
     "directus-extension-bundle"
   ],
-  "type": "module",
   "files": [
     "dist"
   ],
   "directus:extension": {
     "type": "bundle",
-    "path": {
-      "app": "dist/app.js",
-      "api": "dist/api.js"
+    "path": {      
+      "api": "dist/api.js",
+      "app": "dist/app.js"
     },
     "entries": [
       {
         "type": "endpoint",
         "name": "mock-api",
         "source": "src/mock-api/index.js"
+      },
+      {
+        "type": "interface",
+        "name": "agm-boolean-toggle",
+        "source": "src/agm-boolean-toggle/index.js"
       }
     ],
     "host": "^9.26.0"
   },
   "scripts": {
+    "prepare": "npm run build",
     "build": "directus-extension build",
     "dev": "directus-extension build -w --no-minify",
     "link": "directus-extension link",
     "add": "directus-extension add"
   },
   "devDependencies": {
-    "@directus/extensions-sdk": "11.0.9",
+    "@directus/extensions-sdk": "^9.26.0",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "sass": "^1.94.0",
+    "typescript": "^5.9.3",
     "vue": "^3.4.38"
   },
   "dependencies": {
     "@directus/composables": "^9.26.0",
     "@directus/errors": "^1.0.0",
     "@formkit/vue": "^0.17.3",
-    "@rollup/plugin-typescript": "^11.1.2",
     "vue-clipboard3": "^2.0.0",
     "vue-i18n": "^9.2.2"
   },

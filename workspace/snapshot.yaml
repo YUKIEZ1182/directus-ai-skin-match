@@ -1,6 +1,1399 @@
 version: 1
 directus: 9.26.0
 vendor: postgres
-collections: []
-fields: []
-relations: []
+collections:
+  - collection: category
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: category
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: null
+      item_duplication_fields: null
+      note: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations:
+        - language: th-TH
+          translation: หมวดหมู่ผลิตภัณฑ์
+      unarchive_value: null
+    schema:
+      name: category
+  - collection: ingredient
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: ingredient
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: null
+      item_duplication_fields: null
+      note: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations:
+        - language: th-TH
+          translation: ส่วนผสม
+      unarchive_value: null
+    schema:
+      name: ingredient
+  - collection: product
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: product
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: null
+      item_duplication_fields: null
+      note: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations:
+        - language: th-TH
+          translation: รายการผลิตภัณฑ์
+      unarchive_value: null
+    schema:
+      name: product
+  - collection: product_category
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: product_category
+      color: null
+      display_template: null
+      group: null
+      hidden: true
+      icon: import_export
+      item_duplication_fields: null
+      note: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: null
+    schema:
+      name: product_category
+  - collection: product_files
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: product_files
+      color: null
+      display_template: null
+      group: null
+      hidden: true
+      icon: import_export
+      item_duplication_fields: null
+      note: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: null
+    schema:
+      name: product_files
+  - collection: product_ingredient
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: product_ingredient
+      color: null
+      display_template: null
+      group: null
+      hidden: true
+      icon: import_export
+      item_duplication_fields: null
+      note: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: null
+    schema:
+      name: product_ingredient
+fields:
+  - collection: category
+    field: id
+    type: uuid
+    meta:
+      collection: category
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: null
+      special:
+        - uuid
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: category
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: true
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: category
+    field: name
+    type: string
+    meta:
+      collection: category
+      conditions: null
+      display: null
+      display_options: null
+      field: name
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations:
+        - language: th-TH
+          translation: หมวดหมู่
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: name
+      table: category
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: category
+    field: status
+    type: string
+    meta:
+      collection: category
+      conditions: null
+      display: labels
+      display_options:
+        choices:
+          - text: เปิดใช้งาน
+            value: active
+            foreground: '#218770'
+            background: '#9EE0D2'
+          - text: ปิดใช้งานชั่วคราว
+            value: inactive
+            foreground: '#A2B5CD'
+            background: '#18222F'
+      field: status
+      group: null
+      hidden: false
+      interface: select-dropdown
+      note: null
+      options:
+        choices:
+          - text: เปิดใช้งาน
+            value: active
+          - text: ปิดใช้งานชั่วคราว
+            value: inactive
+      readonly: false
+      required: true
+      sort: null
+      special: null
+      translations:
+        - language: th-TH
+          translation: สถานะ
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: status
+      table: category
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: ingredient
+    field: id
+    type: uuid
+    meta:
+      collection: ingredient
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: null
+      special:
+        - uuid
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: ingredient
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: true
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: ingredient
+    field: name
+    type: string
+    meta:
+      collection: ingredient
+      conditions: null
+      display: null
+      display_options: null
+      field: name
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations:
+        - language: th-TH
+          translation: ชื่อส่วนผสม
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: name
+      table: ingredient
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: brand_name
+    type: string
+    meta:
+      collection: product
+      conditions: null
+      display: null
+      display_options: null
+      field: brand_name
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 5
+      special: null
+      translations:
+        - language: th-TH
+          translation: แบรนด์
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: brand_name
+      table: product
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: categories
+    type: alias
+    meta:
+      collection: product
+      conditions: null
+      display: null
+      display_options: null
+      field: categories
+      group: null
+      hidden: false
+      interface: list-m2m
+      note: null
+      options:
+        enableCreate: false
+        template: '{{category_id.name}}'
+      readonly: false
+      required: false
+      sort: 9
+      special:
+        - m2m
+      translations:
+        - language: th-TH
+          translation: หมวดหมู่
+      validation: null
+      validation_message: null
+      width: full
+  - collection: product
+    field: date_created
+    type: timestamp
+    meta:
+      collection: product
+      conditions: null
+      display: datetime
+      display_options: {}
+      field: date_created
+      group: null
+      hidden: true
+      interface: datetime
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 13
+      special:
+        - date-created
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: date_created
+      table: product
+      data_type: timestamp with time zone
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: date_updated
+    type: timestamp
+    meta:
+      collection: product
+      conditions: null
+      display: datetime
+      display_options:
+        relative: true
+      field: date_updated
+      group: null
+      hidden: true
+      interface: datetime
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 14
+      special:
+        - date-updated
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: date_updated
+      table: product
+      data_type: timestamp with time zone
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: description
+    type: text
+    meta:
+      collection: product
+      conditions: null
+      display: null
+      display_options: null
+      field: description
+      group: null
+      hidden: false
+      interface: input-rich-text-html
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 8
+      special: null
+      translations:
+        - language: th-TH
+          translation: คำอธิบาย
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: description
+      table: product
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: id
+    type: integer
+    meta:
+      collection: product
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: product
+      data_type: integer
+      default_value: nextval('product_id_seq'::regclass)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: illustration
+    type: alias
+    meta:
+      collection: product
+      conditions: null
+      display: null
+      display_options: null
+      field: illustration
+      group: null
+      hidden: false
+      interface: files
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 3
+      special:
+        - files
+      translations:
+        - language: th-TH
+          translation: รูปภาพประกอบ
+      validation: null
+      validation_message: null
+      width: full
+  - collection: product
+    field: ingredients
+    type: alias
+    meta:
+      collection: product
+      conditions: null
+      display: null
+      display_options: null
+      field: ingredients
+      group: null
+      hidden: false
+      interface: list-m2m
+      note: null
+      options:
+        enableCreate: false
+        limit: 5
+        template: '{{ingredient_id.name}}'
+      readonly: false
+      required: false
+      sort: 10
+      special:
+        - m2m
+      translations:
+        - language: th-TH
+          translation: ส่วนผสม
+      validation: null
+      validation_message: null
+      width: full
+  - collection: product
+    field: name
+    type: string
+    meta:
+      collection: product
+      conditions: null
+      display: null
+      display_options: null
+      field: name
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 4
+      special: null
+      translations:
+        - language: th-TH
+          translation: ชื่อสินค้า
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: name
+      table: product
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: price
+    type: float
+    meta:
+      collection: product
+      conditions: null
+      display: null
+      display_options: null
+      field: price
+      group: null
+      hidden: false
+      interface: currency
+      note: null
+      options:
+        showTextBaht: true
+      readonly: false
+      required: false
+      sort: 6
+      special: null
+      translations:
+        - language: th-TH
+          translation: ราคา
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: price
+      table: product
+      data_type: real
+      default_value: null
+      max_length: null
+      numeric_precision: 24
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: quantity
+    type: integer
+    meta:
+      collection: product
+      conditions: null
+      display: null
+      display_options: null
+      field: quantity
+      group: null
+      hidden: false
+      interface: currency
+      note: null
+      options:
+        numeric_scale: '0'
+        showTextBaht: false
+      readonly: false
+      required: false
+      sort: 7
+      special: null
+      translations:
+        - language: en-US
+          translation: จำนวน
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: quantity
+      table: product
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: status
+    type: string
+    meta:
+      collection: product
+      conditions: null
+      display: labels
+      display_options:
+        choices:
+          - text: พร้อมขาย
+            value: active
+            foreground: '#218770'
+            background: '#9EE0D2'
+          - text: หมดสต็อก
+            value: inactive
+            foreground: '#B22A40'
+            background: '#FF8095'
+      field: status
+      group: null
+      hidden: false
+      interface: select-dropdown
+      note: null
+      options:
+        choices:
+          - text: พร้อมขาย
+            value: active
+          - text: หมดสต็อก
+            value: inactive
+      readonly: false
+      required: false
+      sort: 12
+      special: null
+      translations:
+        - language: th-TH
+          translation: สถานะ
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: status
+      table: product
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: suitable_skin_type
+    type: json
+    meta:
+      collection: product
+      conditions: null
+      display: labels
+      display_options:
+        choices:
+          - text: ผิวแพ้ง่าย
+            value: sensitive_skin
+          - text: ผิวมัน
+            value: ' oily_skin'
+          - text: ผิวแห้ง
+            value: dry_skin
+          - text: ผิวผสม
+            value: combination_skin
+      field: suitable_skin_type
+      group: null
+      hidden: false
+      interface: select-multiple-dropdown
+      note: null
+      options:
+        choices:
+          - text: ผิวแพ้ง่าย
+            value: sensitive_skin
+          - text: ผิวมัน
+            value: ' oily_skin'
+          - text: ผิวแห้ง
+            value: dry_skin
+          - text: ผิวผสม
+            value: combination_skin
+      readonly: false
+      required: false
+      sort: 11
+      special:
+        - cast-json
+      translations:
+        - language: th-TH
+          translation: ผิวที่เหมาะสม
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: suitable_skin_type
+      table: product
+      data_type: json
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product
+    field: thumbnail
+    type: uuid
+    meta:
+      collection: product
+      conditions: null
+      display: image
+      display_options: {}
+      field: thumbnail
+      group: null
+      hidden: false
+      interface: file-image
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 2
+      special:
+        - file
+      translations:
+        - language: th-TH
+          translation: รูปภาพผลิตภัณฑ์
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: thumbnail
+      table: product
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_files
+      foreign_key_column: id
+  - collection: product_category
+    field: category_id
+    type: uuid
+    meta:
+      collection: product_category
+      conditions: null
+      display: null
+      display_options: null
+      field: category_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: category_id
+      table: product_category
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: category
+      foreign_key_column: id
+  - collection: product_category
+    field: id
+    type: integer
+    meta:
+      collection: product_category
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: product_category
+      data_type: integer
+      default_value: nextval('product_category_id_seq'::regclass)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product_category
+    field: product_id
+    type: integer
+    meta:
+      collection: product_category
+      conditions: null
+      display: null
+      display_options: null
+      field: product_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: product_id
+      table: product_category
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: product
+      foreign_key_column: id
+  - collection: product_files
+    field: directus_files_id
+    type: uuid
+    meta:
+      collection: product_files
+      conditions: null
+      display: null
+      display_options: null
+      field: directus_files_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: directus_files_id
+      table: product_files
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_files
+      foreign_key_column: id
+  - collection: product_files
+    field: id
+    type: integer
+    meta:
+      collection: product_files
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: product_files
+      data_type: integer
+      default_value: nextval('product_files_id_seq'::regclass)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product_files
+    field: product_id
+    type: integer
+    meta:
+      collection: product_files
+      conditions: null
+      display: null
+      display_options: null
+      field: product_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: product_id
+      table: product_files
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: product
+      foreign_key_column: id
+  - collection: product_ingredient
+    field: id
+    type: integer
+    meta:
+      collection: product_ingredient
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: product_ingredient
+      data_type: integer
+      default_value: nextval('product_ingredient_id_seq'::regclass)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: product_ingredient
+    field: ingredient_id
+    type: uuid
+    meta:
+      collection: product_ingredient
+      conditions: null
+      display: null
+      display_options: null
+      field: ingredient_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: ingredient_id
+      table: product_ingredient
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: ingredient
+      foreign_key_column: id
+  - collection: product_ingredient
+    field: product_id
+    type: integer
+    meta:
+      collection: product_ingredient
+      conditions: null
+      display: null
+      display_options: null
+      field: product_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: null
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: product_id
+      table: product_ingredient
+      data_type: integer
+      default_value: null
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: true
+      is_unique: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: product
+      foreign_key_column: id
+relations:
+  - collection: product
+    field: thumbnail
+    related_collection: directus_files
+    meta:
+      junction_field: null
+      many_collection: product
+      many_field: thumbnail
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: product
+      column: thumbnail
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: product_thumbnail_foreign
+      on_update: NO ACTION
+      on_delete: SET NULL
+  - collection: product_category
+    field: category_id
+    related_collection: category
+    meta:
+      junction_field: product_id
+      many_collection: product_category
+      many_field: category_id
+      one_allowed_collections: null
+      one_collection: category
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: product_category
+      column: category_id
+      foreign_key_table: category
+      foreign_key_column: id
+      constraint_name: product_category_category_id_foreign
+      on_update: NO ACTION
+      on_delete: SET NULL
+  - collection: product_category
+    field: product_id
+    related_collection: product
+    meta:
+      junction_field: category_id
+      many_collection: product_category
+      many_field: product_id
+      one_allowed_collections: null
+      one_collection: product
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: categories
+      sort_field: null
+    schema:
+      table: product_category
+      column: product_id
+      foreign_key_table: product
+      foreign_key_column: id
+      constraint_name: product_category_product_id_foreign
+      on_update: NO ACTION
+      on_delete: SET NULL
+  - collection: product_files
+    field: directus_files_id
+    related_collection: directus_files
+    meta:
+      junction_field: product_id
+      many_collection: product_files
+      many_field: directus_files_id
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: product_files
+      column: directus_files_id
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: product_files_directus_files_id_foreign
+      on_update: NO ACTION
+      on_delete: SET NULL
+  - collection: product_files
+    field: product_id
+    related_collection: product
+    meta:
+      junction_field: directus_files_id
+      many_collection: product_files
+      many_field: product_id
+      one_allowed_collections: null
+      one_collection: product
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: illustration
+      sort_field: null
+    schema:
+      table: product_files
+      column: product_id
+      foreign_key_table: product
+      foreign_key_column: id
+      constraint_name: product_files_product_id_foreign
+      on_update: NO ACTION
+      on_delete: SET NULL
+  - collection: product_ingredient
+    field: ingredient_id
+    related_collection: ingredient
+    meta:
+      junction_field: product_id
+      many_collection: product_ingredient
+      many_field: ingredient_id
+      one_allowed_collections: null
+      one_collection: ingredient
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: product_ingredient
+      column: ingredient_id
+      foreign_key_table: ingredient
+      foreign_key_column: id
+      constraint_name: product_ingredient_ingredient_id_foreign
+      on_update: NO ACTION
+      on_delete: SET NULL
+  - collection: product_ingredient
+    field: product_id
+    related_collection: product
+    meta:
+      junction_field: ingredient_id
+      many_collection: product_ingredient
+      many_field: product_id
+      one_allowed_collections: null
+      one_collection: product
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: ingredients
+      sort_field: null
+    schema:
+      table: product_ingredient
+      column: product_id
+      foreign_key_table: product
+      foreign_key_column: id
+      constraint_name: product_ingredient_product_id_foreign
+      on_update: NO ACTION
+      on_delete: SET NULL
