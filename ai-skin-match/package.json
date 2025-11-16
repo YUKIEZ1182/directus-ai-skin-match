@@ -21,11 +21,6 @@
         "type": "endpoint",
         "name": "mock-api",
         "source": "src/mock-api/index.js"
-      },
-      {
-        "type": "interface",
-        "name": "agm-boolean-toggle",
-        "source": "src/agm-boolean-toggle/index.js"
       }
     ],
     "host": "^9.26.0"
