@@ -12,10 +12,6 @@ COPY workspace/package-lock.json /app/package-lock.json
 USER root
 RUN npm install --unsafe-perm=true --allow-root
 
-RUN --mount=type=bind,source=.npmrc,target=/root/.npmrc \
-    npm install --userconfig=/root/.npmrc --unsafe-perm=true --allow-root --no-save dd-trace
-
-
 FROM directus/directus:9.26.0
 
 WORKDIR /app
@@ -28,8 +24,6 @@ RUN chmod +x /app/entrypoint.sh
 
 ENV SCHEMA_NAME="snapshot"
 COPY workspace/snapshot.yaml /app/snapshot.yaml
-
-ENV NODE_OPTIONS="--require=/app/node_modules/dd-trace/init"
 
 EXPOSE 8055
 
