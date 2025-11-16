@@ -7,7 +7,7 @@ COPY ai-skin-match/package.json /app/ai-skin-match/package.json
 COPY ai-skin-match/package-lock.json /app/ai-skin-match/package-lock.json
 
 WORKDIR /app/ai-skin-match
-RUN npm install --unsafe-perm=true --allow-root
+RUN npm install --unsafe-perm=true --allow-root --ignore-scripts
 
 COPY ai-skin-match /app/ai-skin-match
 RUN npm run build
@@ -17,7 +17,7 @@ COPY workspace/package.json /app/workspace/package.json
 COPY workspace/package-lock.json /app/workspace/package-lock.json
 
 WORKDIR /app/workspace
-RUN npm install --unsafe-perm=true --allow-root
+RUN npm install --unsafe-perm=true --allow-root --ignore-scripts
 
 
 FROM directus/directus:9.26.0
