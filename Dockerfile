@@ -7,7 +7,7 @@ COPY ai-skin-match/package.json /app/ai-skin-match/package.json
 COPY ai-skin-match/package-lock.json /app/ai-skin-match/package-lock.json
 
 WORKDIR /app/ai-skin-match
-RUN npm install --unsafe-perm=true --allow-root --ignore-scripts
+RUN npm install --unsafe-perm=true --allow-root --ignore-scripts --production=false
 
 COPY ai-skin-match /app/ai-skin-match
 RUN npm run build
