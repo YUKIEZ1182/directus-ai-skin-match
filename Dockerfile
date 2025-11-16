@@ -29,6 +29,9 @@ COPY --from=builder /app/workspace/package.json /app/package.json
 
 COPY --from=builder /app/ai-skin-match /app/ai-skin-match
 
+USER root
+RUN npm rebuild --unsafe-perm=true --allow-root
+
 COPY --chown=node:node workspace/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
