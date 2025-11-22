@@ -15,7 +15,7 @@ cleanup() {
         kill -9 $pid
     fi
     echo "Taking snapshot... please wait."
-    npx directus schema snapshot --yes ./$SCHEMA_NAME.yaml
+    directus schema snapshot --yes ./$SCHEMA_NAME.yaml
     exit 0
 }
 
@@ -24,10 +24,10 @@ trap cleanup SIGTERM SIGINT
 
 # Start Directus with Datadog Tracing
 echo "Directus is booting with Datadog tracing enabled..."
-npx directus bootstrap
+directus bootstrap
 
 echo "Applying schema from $SCHEMA_NAME.yaml..."
-npx directus schema apply --yes ./$SCHEMA_NAME.yaml
+directus schema apply --yes ./$SCHEMA_NAME.yaml
 
 echo "Starting Directus with Datadog APM tracing..."
-exec npx directus start
+exec directus start

@@ -11,7 +11,7 @@ cleanup() {
         kill -9 $pid
     fi
     echo "Taking snapshot... please wait."
-    npx directus schema snapshot --yes ./snapshot.yaml
+    directus schema snapshot --yes ./snapshot.yaml
     exit 0
 }
 
@@ -21,8 +21,8 @@ trap cleanup SIGTERM SIGINT
 # Main script logic
 echo "Directus is booting. Press Ctrl+C to send SIGINT or terminate the process to send SIGTERM."
 cd workspace
-npx directus bootstrap
+directus bootstrap
 echo "Applying schema from snapshot.yaml"
-npx directus schema apply --yes ./snapshot.yaml
+directus schema apply --yes ./snapshot.yaml
 echo "Starting directus"
-npx directus start
+directus start
