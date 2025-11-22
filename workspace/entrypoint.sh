@@ -22,6 +22,8 @@ cleanup() {
 # Trap SIGTERM and SIGINT signals
 trap cleanup SIGTERM SIGINT
 
+cd /app/workspace
+
 # Start Directus with Datadog Tracing
 echo "Directus is booting with Datadog tracing enabled..."
 npx directus bootstrap
