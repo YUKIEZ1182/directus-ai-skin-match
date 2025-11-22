@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 sigint_count=0
@@ -15,16 +14,18 @@ cleanup() {
         kill -9 $pid
     fi
     echo "Taking snapshot... please wait."
-    npx directus schema snapshot --yes ./$SCHEMA_NAME.yaml
+    # Use subshell to run cleanup from the correct directory
+    (cd /app/workspace && npx directus schema snapshot --yes ./$SCHEMA_NAME.yaml)
     exit 0
 }
 
 # Trap SIGTERM and SIGINT signals
 trap cleanup SIGTERM SIGINT
 
+# 📌 FIX: Change directory to the workspace where Directus 9.26.0 is installed
 cd /app/workspace
 
-# Start Directus with Datadog Tracing
+# Start Directus 
 echo "Directus is booting with Datadog tracing enabled..."
 npx directus bootstrap
 
