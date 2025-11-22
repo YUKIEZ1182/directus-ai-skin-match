@@ -36,5 +36,6 @@ USER node
 
 EXPOSE 8055
 
-ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
-CMD ["npx", "directus", "bootstrap", "&&", "npx", "directus", "start"]
+ENTRYPOINT ["/bin/bash", "./entrypoint.sh"]
+# แก้ปัญหา 502: บังคับให้ Directus ฟังบน 0.0.0.0
+CMD ["/bin/bash", "-c", "npx directus bootstrap && HOST=0.0.0.0 npx directus start"]
