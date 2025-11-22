@@ -1,4 +1,2 @@
-#!/bin/bash
-# no verbose
-
+#!/bin/sh
 exec "$@"
