@@ -6,7 +6,7 @@
     "directus-extension-group-tabs-interface": "^1.2.2",
     "directus-extension-inline-form-interface": "^1.1.0",
     "directus-extension-schema-management-module": "^1.5.0",
-    "directus-extension-ai-skin-match": "file://../ai-skin-match"
+    "directus-extension-ai-skin-match": "file://./ai-skin-match"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
