@@ -1,7 +1,7 @@
 {
   "name": "directus-extension-ai-skin-match",
   "icon": "extension",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "keywords": [
     "directus",
     "directus-extension",
@@ -12,15 +12,15 @@
   ],
   "directus:extension": {
     "type": "bundle",
-    "path": {      
+    "path": {
       "api": "dist/api.js",
       "app": "dist/app.js"
     },
     "entries": [
       {
         "type": "endpoint",
-        "name": "mock-api",
-        "source": "src/mock-api/index.js"
+        "name": "recommend",
+        "source": "src/recommend/index.js"
       }
     ],
     "host": "^9.26.0"
@@ -43,6 +43,7 @@
     "@directus/composables": "^9.26.0",
     "@directus/errors": "^1.0.0",
     "@formkit/vue": "^0.17.3",
+    "axios": "^1.13.2",
     "vue-clipboard3": "^2.0.0",
     "vue-i18n": "^9.2.2"
   },
