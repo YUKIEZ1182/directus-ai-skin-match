@@ -1,5 +1,31 @@
-export default (router, { services }) => {
+export default (router, { services, database }) => {
   const { ItemsService } = services;
+
+  function getDate(date, yearIndex) {
+    const year = date.getFullYear().toString().substring(yearIndex);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}${month}${day}`;
+  }
+
+  async function generateSequence(knex, sequenceName) {
+    await knex.raw(`CREATE SEQUENCE IF NOT EXISTS ${sequenceName}`);
+    const result = await knex.raw(`SELECT nextval('${sequenceName}')`);
+    return result.rows[0]?.nextval;
+  }
+
+  function generateRunningNumber(date, count, prefix, padding) {
+    const runningNumber = count.toString().padStart(padding, '0');
+    return `${prefix}${date}${runningNumber}`;
+  }
+
+  async function generateOrderNo(knex) {
+    const prefix = 'AI-SK-';
+    const dateStr = getDate(new Date(), 2);
+    const seqName = `order_no_seq_${dateStr}`;
+    const seq = await generateSequence(knex, seqName);
+    return generateRunningNumber(dateStr, seq, prefix, 4);
+  }
 
   router.post('/checkout', async (req, res) => {
     if (!req.accountability || !req.accountability.user) {
@@ -7,7 +33,6 @@ export default (router, { services }) => {
     }
 
     const userId = req.accountability.user;
-    const database = req.database;
 
     try {
       await database.transaction(async (trx) => {
@@ -62,11 +87,13 @@ export default (router, { services }) => {
           });
         }
 
+        const orderNo = await generateOrderNo(trx);
+
         const newOrder = await orderService.createOne({
           owner: userId,
+          order_no: orderNo,
           order_date: new Date(),
           total_price: totalPrice,
-          status: 'pending_payment'
         });
 
         const detailsWithOrderId = orderDetailsPayload.map(detail => ({
@@ -106,11 +133,6 @@ export default (router, { services }) => {
       await database.transaction(async (trx) => {
         const adminAccountability = { admin: true };
 
-        const orderService = new ItemsService('order', {
-          schema: req.schema,
-          accountability: adminAccountability,
-          knex: trx
-        });
         const orderDetailService = new ItemsService('order_detail', {
           schema: req.schema,
           accountability: adminAccountability,
@@ -145,10 +167,6 @@ export default (router, { services }) => {
             quantity: newQuantity
           });
         }
-
-        await orderService.updateOne(order_id, {
-          status: 'paid'
-        });
 
         res.json({ success: true, message: "Payment confirmed, stock updated" });
       });
