@@ -72,7 +72,7 @@ export default (router, { services, database }) => {
           if (!item.product) continue;
           totalPrice += item.product.price * item.quantity;
           orderDetailsPayload.push({
-            product: item.product.id,
+            product_id: item.product.id,
             quantity: item.quantity,
             price_at_purchase: item.product.price,
           });
@@ -151,49 +151,57 @@ export default (router, { services, database }) => {
       return res.status(400).json({ error: "Invalid payment" });
 
     try {
+      const schema = req.schema;
+      const adminAcc = { admin: true };
+
       await database.transaction(async (trx) => {
-        const adminAcc = { admin: true };
         const orderService = new ItemsService("order", {
-          schema: req.schema,
+          schema,
           accountability: adminAcc,
           knex: trx,
         });
         const orderDetailService = new ItemsService("order_detail", {
-          schema: req.schema,
+          schema,
           accountability: adminAcc,
           knex: trx,
         });
         const productService = new ItemsService("product", {
-          schema: req.schema,
+          schema,
           accountability: adminAcc,
           knex: trx,
         });
         const cartService = new ItemsService("cart_detail", {
-          schema: req.schema,
+          schema,
           accountability: adminAcc,
           knex: trx,
         });
 
-        const order = await orderService.readOne(order_id);
+        const order = await orderService.readOne(order_id, {
+          fields: ["id", "status", "owner"],
+        });
         if (!order || order.status === "paid")
           return res.json({ message: "Already paid or not found" });
 
         const orderDetails = await orderDetailService.readByQuery({
           filter: { order_id: { _eq: order_id } },
-          fields: ["product", "quantity"],
+          fields: ["product_id", "quantity"],
+          limit: -1,
         });
 
         for (const item of orderDetails) {
-          const product = await productService.readOne(item.product);
+          const product = await productService.readOne(item.product_id, {
+            fields: ["id", "quantity"],
+          });
           if (product) {
-            await productService.updateOne(item.product, {
+            await productService.updateOne(item.product_id, {
               quantity: product.quantity - item.quantity,
             });
+
             await cartService.deleteByQuery({
               filter: {
                 _and: [
                   { owner: { _eq: order.owner } },
-                  { product: { _eq: item.product } },
+                  { product: { _eq: item.product_id } },
                 ],
               },
             });
@@ -204,6 +212,7 @@ export default (router, { services, database }) => {
         res.json({ success: true });
       });
     } catch (error) {
+      console.error("Webhook Error:", error);
       res.status(500).json({ error: error.message });
     }
   });
