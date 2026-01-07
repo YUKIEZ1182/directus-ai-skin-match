@@ -1,7 +1,7 @@
 {
   "name": "directus-extension-ai-skin-match",
   "icon": "extension",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "keywords": [
     "directus",
     "directus-extension",
@@ -21,6 +21,11 @@
         "type": "endpoint",
         "name": "recommend",
         "source": "src/recommend/index.js"
+      },
+      {
+        "type": "endpoint",
+        "name": "shop",
+        "source": "src/shop/index.js"
       }
     ],
     "host": "^9.26.0"
