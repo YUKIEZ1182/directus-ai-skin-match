@@ -1,8 +1,15 @@
 export default (router, { services, database }) => {
   const { ItemsService } = services;
 
-  function getDate(date, yearIndex) {
-    const year = date.getFullYear().toString().substring(yearIndex);
+  function getYYYYMMDD(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function getDateForRunning(date) {
+    const year = date.getFullYear().toString().substring(2);
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
     return `${year}${month}${day}`;
@@ -14,17 +21,12 @@ export default (router, { services, database }) => {
     return result.rows[0]?.nextval;
   }
 
-  function generateRunningNumber(date, count, prefix, padding) {
-    const runningNumber = count.toString().padStart(padding, "0");
-    return `${prefix}${date}${runningNumber}`;
-  }
-
   async function generateOrderNo(knex) {
-    const prefix = "AI-SK-";
-    const dateStr = getDate(new Date(), 2);
+    const dateStr = getDateForRunning(new Date());
     const seqName = `order_no_seq_${dateStr}`;
     const seq = await generateSequence(knex, seqName);
-    return generateRunningNumber(dateStr, seq, prefix, 4);
+    const running = seq.toString().padStart(4, "0");
+    return `AI-SK-${dateStr}${running}`;
   }
 
   router.post("/checkout", async (req, res) => {
@@ -34,6 +36,7 @@ export default (router, { services, database }) => {
 
     const userId = req.accountability.user;
     const { item_ids } = req.body;
+    const todayStr = getYYYYMMDD(new Date());
 
     try {
       await database.transaction(async (trx) => {
@@ -57,14 +60,7 @@ export default (router, { services, database }) => {
           filter: {
             _and: [{ owner: { _eq: userId } }, { id: { _in: item_ids } }],
           },
-          fields: [
-            "id",
-            "quantity",
-            "product.id",
-            "product.price",
-            "product.name",
-            "product.quantity",
-          ],
+          fields: ["id", "quantity", "product.id", "product.price"],
         });
 
         if (!cartItems || cartItems.length === 0)
@@ -82,27 +78,58 @@ export default (router, { services, database }) => {
           });
         }
 
-        const orderNo = await generateOrderNo(trx);
-
-        const newOrder = await orderService.createOne({
-          owner: userId,
-          order_no: orderNo,
-          order_date: new Date(),
-          total_price: totalPrice,
-          status: "pending",
+        const existingOrders = await orderService.readByQuery({
+          filter: {
+            _and: [
+              { owner: { _eq: userId } },
+              { status: { _eq: "pending" } },
+              { order_date: { _eq: todayStr } },
+            ],
+          },
+          fields: ["id", "order_no"],
+          limit: 1,
         });
+
+        let targetOrderId;
+        let targetOrderNo;
+
+        if (existingOrders.length > 0) {
+          const existing = existingOrders[0];
+          targetOrderId = existing.id;
+          targetOrderNo = existing.order_no;
+
+          await orderService.updateOne(targetOrderId, {
+            total_price: totalPrice,
+          });
+
+          await orderDetailService.deleteByQuery({
+            filter: { order_id: { _eq: targetOrderId } },
+          });
+        } else {
+          targetOrderNo = await generateOrderNo(trx);
+          const newOrder = await orderService.createOne({
+            owner: userId,
+            order_no: targetOrderNo,
+            order_date: todayStr,
+            total_price: totalPrice,
+            status: "pending",
+          });
+          targetOrderId = newOrder.id;
+        }
+
+        if (!targetOrderId) throw new Error("Failed to retrieve Order ID");
 
         const detailsWithOrderId = orderDetailsPayload.map((detail) => ({
           ...detail,
-          order_id: newOrder.id,
+          order_id: targetOrderId,
         }));
 
         await orderDetailService.createMany(detailsWithOrderId);
 
         res.json({
           success: true,
-          order_id: newOrder.id,
-          order_no: orderNo,
+          order_id: targetOrderId,
+          order_no: targetOrderNo,
           total_price: totalPrice,
         });
       });
@@ -141,8 +168,8 @@ export default (router, { services, database }) => {
         });
 
         const order = await orderService.readOne(order_id);
-        if (order.status === "paid")
-          return res.json({ message: "Already paid" });
+        if (!order || order.status === "paid")
+          return res.json({ message: "Already paid or not found" });
 
         const orderDetails = await orderDetailService.readByQuery({
           filter: { order_id: { _eq: order_id } },
@@ -151,23 +178,23 @@ export default (router, { services, database }) => {
 
         for (const item of orderDetails) {
           const product = await productService.readOne(item.product);
-          await productService.updateOne(item.product, {
-            quantity: product.quantity - item.quantity,
-          });
-
-          await cartService.deleteByQuery({
-            filter: {
-              _and: [
-                { owner: { _eq: order.owner } },
-                { product: { _eq: item.product } },
-              ],
-            },
-          });
+          if (product) {
+            await productService.updateOne(item.product, {
+              quantity: product.quantity - item.quantity,
+            });
+            await cartService.deleteByQuery({
+              filter: {
+                _and: [
+                  { owner: { _eq: order.owner } },
+                  { product: { _eq: item.product } },
+                ],
+              },
+            });
+          }
         }
 
         await orderService.updateOne(order_id, { status: "paid" });
-
-        res.json({ success: true, message: "Order paid and stock updated" });
+        res.json({ success: true });
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
