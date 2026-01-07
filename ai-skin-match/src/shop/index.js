@@ -95,26 +95,33 @@ export default (router, { services, database }) => {
 
         if (existingOrders.length > 0) {
           const existing = existingOrders[0];
-          targetOrderId = existing.id;
-          targetOrderNo = existing.order_no;
+          targetOrderId = typeof existing === "object" ? existing.id : existing;
+
+          if (typeof existing === "object") {
+            targetOrderNo = existing.order_no;
+          } else {
+            const fetchedOrder = await orderService.readOne(targetOrderId, {
+              fields: ["order_no"],
+            });
+            targetOrderNo = fetchedOrder.order_no;
+          }
 
           await orderService.updateOne(targetOrderId, {
             total_price: totalPrice,
           });
-
           await orderDetailService.deleteByQuery({
             filter: { order_id: { _eq: targetOrderId } },
           });
         } else {
           targetOrderNo = await generateOrderNo(trx);
-          const newOrder = await orderService.createOne({
+          const result = await orderService.createOne({
             owner: userId,
             order_no: targetOrderNo,
             order_date: todayStr,
             total_price: totalPrice,
             status: "pending",
           });
-          targetOrderId = newOrder.id;
+          targetOrderId = typeof result === "object" ? result.id : result;
         }
 
         if (!targetOrderId) throw new Error("Failed to retrieve Order ID");
