@@ -10,7 +10,10 @@ export default ({ schedule }, { services, env, logger, getSchema }) => {
 
         try {
             const schema = await getSchema();
-            const productService = new ItemsService('product', { schema });
+            const productService = new ItemsService('product', { 
+                schema: schema, 
+                accountability: { admin: true } 
+            });
 
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
