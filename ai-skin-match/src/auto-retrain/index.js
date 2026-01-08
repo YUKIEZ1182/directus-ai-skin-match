@@ -3,8 +3,10 @@ import axios from 'axios';
 export default ({ schedule }, { services, env, logger, getSchema }) => {
     const { ItemsService } = services;
 
-    schedule('0 0 * * 1', async () => {
-        logger.info('AI Skin Match: เริ่มต้นดึงข้อมูลสินค้าประจำสัปดาห์เพื่อ Retrain...');
+    const RETRAIN_SCHEDULE = env.AI_RETRAIN_SCHEDULE || '0 0 * * 1';
+
+    schedule(RETRAIN_SCHEDULE, async () => {
+        logger.info(`Retraining cron job is starting`);
 
         try {
             const schema = await getSchema();
@@ -25,7 +27,7 @@ export default ({ schedule }, { services, env, logger, getSchema }) => {
             });
 
             if (updatedProducts.length === 0) {
-                logger.info('AI Skin Match: ไม่มีสินค้าอัปเดตใหม่ใน 7 วันที่ผ่านมา ข้ามการ Retrain');
+                logger.info('new product not found, skip retrain');
                 return;
             }
 
@@ -36,14 +38,14 @@ export default ({ schedule }, { services, env, logger, getSchema }) => {
                     .map(item => item.ingredient_id?.name)
                     .filter(name => name)
                     .join(', '),
-                skin_types: p.suitable_skin_type 
+                skin_types: p.suitable_skin_type
             }));
 
-            // 4. ส่งไปที่ Python API
             const PYTHON_API_URL = env.PYTHON_API_URL;
+            
             const response = await axios.post(`${PYTHON_API_URL}/retrain`, payload);
             
-            logger.info(`AI Skin Match: Retrain สำเร็จ! ข้อมูลอัปเดต: ${response.data.updated}, เพิ่มใหม่: ${response.data.new_added}`);
+            logger.info(` Retrain success (Updated: ${response.data.updated}, Added: ${response.data.new_added})`);
 
         } catch (error) {
             logger.error(`AI Skin Match Error: ${error.message}`);
