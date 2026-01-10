@@ -57,15 +57,15 @@ export default (router, { services, env, exceptions }) => {
         });
       }
 
-      const PYTHON_API_URL = env.PYTHON_API_URL || 'http://host.docker.internal:5000';
+      const PYTHON_API_URL = env.PYTHON_API_URL;
       
       let recommendedIngredients = [];
       try {
         const modelResponse = await axios.get(`${PYTHON_API_URL}/skin-type-recommend`, {
-          params: { skin_type: user.skin_type }
+          params: { skinType: user.skin_type }
         });
         
-        recommendedIngredients = modelResponse.data.recommended_ingredients || [];
+        recommendedIngredients = modelResponse.data.recommendedIngredients || [];
 
       } catch (error) {
         console.error("Python Model API Error:", error.message);
