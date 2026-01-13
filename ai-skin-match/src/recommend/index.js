@@ -1,58 +1,58 @@
 import axios from 'axios';
 
-export default (router, { services, env, exceptions }) => {
+export default (router, { services, env }) => {
   const { ItemsService } = services;
 
-  const filterAndRankProducts = (products, targetIngredients, minMatch = 2) => {
-    let ranked = products.map(product => {
+  const filterAndRankProducts = (products, targetIngredients, minimumMatch = 2) => {
+    let rankedProducts = products.map(product => {
         let matchScore = 0;
-        const productIngList = (product.ingredients || []).map(item => 
+        const productIngredientList = (product.ingredients || []).map(item => 
           item.ingredient_id?.name?.toLowerCase() || ""
         );
         
         targetIngredients.forEach(target => {
-            if (productIngList.some(pIng => pIng.includes(target.toLowerCase()))) {
+            if (productIngredientList.some(productIngredient => productIngredient.includes(target.toLowerCase()))) {
                 matchScore++;
             }
         });
         return { ...product, match_score: matchScore };
     });
 
-    const highScorers = ranked.filter(p => p.match_score >= minMatch);
+    const highScorerProducts = rankedProducts.filter(product => product.match_score >= minimumMatch);
     
-    let finalResult = highScorers.length > 0 ? highScorers : ranked.filter(p => p.match_score >= 1);
+    let finalResultList = highScorerProducts.length > 0 ? highScorerProducts : rankedProducts.filter(product => product.match_score >= 1);
 
-    finalResult.sort((a, b) => {
-        if (b.match_score !== a.match_score) {
-            return b.match_score - a.match_score;
+    finalResultList.sort((firstItem, secondItem) => {
+        if (secondItem.match_score !== firstItem.match_score) {
+            return secondItem.match_score - firstItem.match_score;
         }
-        const dateA = new Date(a.date_updated || a.date_created || 0);
-        const dateB = new Date(b.date_updated || b.date_created || 0);
-        return dateB - dateA;
+        const dateFirst = new Date(firstItem.date_updated || firstItem.date_created || 0);
+        const dateSecond = new Date(secondItem.date_updated || secondItem.date_created || 0);
+        return dateSecond - dateFirst;
     });
 
-    return finalResult.slice(0, 12);
+    return finalResultList.slice(0, 12);
   };
 
-  router.get('/product-for-skin-type', async (req, res) => {
+  router.get('/product-for-skin-type', async (request, response) => {
     
-    if (!req.accountability || !req.accountability.user) {
-      return res.status(401).json({ error: "Unauthorized: Please log in." });
+    if (!request.accountability || !request.accountability.user) {
+      return response.status(401).json({ error: "Unauthorized: Please log in." });
     }
 
     try {
       const usersService = new ItemsService('directus_users', { 
-        schema: req.schema, 
-        accountability: req.accountability
+        schema: request.schema, 
+        accountability: request.accountability
       });
 
-      const user = await usersService.readOne(req.accountability.user, {
+      const currentUser = await usersService.readOne(request.accountability.user, {
         fields: ['skin_type']
       });
 
-      if (!user.skin_type) {
-        return res.status(400).json({ 
-          error: "User has no skin_type specified.",
+      if (!currentUser.skin_type) {
+        return response.status(400).json({ 
+          error: "User has no skin type specified.",
           action: "Please update your profile with a skin type."
         });
       }
@@ -62,33 +62,33 @@ export default (router, { services, env, exceptions }) => {
       let recommendedIngredients = [];
       try {
         const modelResponse = await axios.get(`${PYTHON_API_URL}/skin-type-recommend`, {
-          params: { skinType: user.skin_type }
+          params: { skinType: currentUser.skin_type }
         });
         
         recommendedIngredients = modelResponse.data.recommendedIngredients || [];
 
       } catch (error) {
         console.error("Python Model API Error:", error.message);
-        return res.status(503).json({ error: "Cannot connect to recommendation model." });
+        return response.status(503).json({ error: "Cannot connect to recommendation model." });
       }
 
       if (recommendedIngredients.length === 0) {
-        return res.json({ count: 0, data: [] });
+        return response.json({ count: 0, data: [] });
       }
 
       const productFilter = {
-        _or: recommendedIngredients.map(ing => ({
+        _or: recommendedIngredients.map(ingredient => ({
           ingredients: {
             ingredient_id: {
-              name: { _icontains: ing }
+              name: { _icontains: ingredient }
             }
           }
         }))
       };
 
       const productService = new ItemsService('product', { 
-        schema: req.schema, 
-        accountability: req.accountability 
+        schema: request.schema, 
+        accountability: request.accountability 
       });
 
       const products = await productService.readByQuery({
@@ -97,42 +97,40 @@ export default (router, { services, env, exceptions }) => {
         fields: ['*', 'ingredients.ingredient_id.name'] 
       });
       
-      const finalProducts = filterAndRankProducts(products, recommendedIngredients, 2);
+      const finalRecommendedProducts = filterAndRankProducts(products, recommendedIngredients, 2);
 
-      res.json({
-        user_skin_type: user.skin_type,
+      response.json({
+        user_skin_type: currentUser.skin_type,
         recommended_ingredients: recommendedIngredients,
-        count: finalProducts.length,
-        data: finalProducts
+        count: finalRecommendedProducts.length,
+        data: finalRecommendedProducts
       });
 
     } catch (error) {
       console.error("Endpoint Error:", error);
-      res.status(500).json({ error: error.message });
+      response.status(500).json({ error: error.message });
     }
   });
 
-  router.get('/similar-product', async (req, res) => {
-    const productId = req.query.product_id;
+  router.get('/similar-product', async (request, response) => {
+    const productId = request.query.product_id;
 
     if (!productId) {
-      return res.status(400).json({ error: "Please provide a product_id" });
+      return response.status(400).json({ error: "Please provide a product_id" });
     }
 
     try {
-      const { ItemsService } = services;
-
       const productService = new ItemsService('product', { 
-        schema: req.schema, 
-        accountability: req.accountability 
+        schema: request.schema, 
+        accountability: request.accountability 
       });
 
       const sourceProduct = await productService.readOne(productId, {
-        fields: ['id', 'name', 'ingredients.ingredient_id.name']
+        fields: ['id', 'name', 'category', 'ingredients.ingredient_id.name']
       });
 
       if (!sourceProduct) {
-        return res.status(404).json({ error: "Product not found" });
+        return response.status(404).json({ error: "Product not found" });
       }
 
       const sourceIngredients = (sourceProduct.ingredients || []).map(item => 
@@ -140,53 +138,58 @@ export default (router, { services, env, exceptions }) => {
       ).filter(name => name !== "");
 
       if (sourceIngredients.length === 0) {
-        return res.json({ count: 0, data: [] });
+        return response.json({ count: 0, data: [] });
       }
 
       const PYTHON_API_URL = env.PYTHON_API_URL || 'http://host.docker.internal:5000';
       
-      let rules = [];
+      let associationRules = [];
       try {
-        const response = await axios.get(`${PYTHON_API_URL}/rules`, {
+        const modelResponse = await axios.get(`${PYTHON_API_URL}/related-ingredients-recommend`, {
           params: { ingredient: sourceIngredients.join(',') }
         });
-        rules = response.data || [];
+        associationRules = modelResponse.data || [];
       } catch (error) {
         console.error("Python API Error:", error.message);
-        return res.status(503).json({ error: "Cannot connect to association model." });
+        return response.status(503).json({ error: "Cannot connect to association model." });
       }
 
-      if (rules.length === 0) {
-        return res.json({ count: 0, data: [] });
+      if (associationRules.length === 0) {
+        return response.json({ count: 0, data: [] });
       }
 
-      const associatedIngredients = new Set();
+      const associatedIngredientsSet = new Set();
       
-      rules.forEach(rule => {
-        const allInRule = [...rule.antecedents, ...rule.consequents];
-        allInRule.forEach(ing => {
-            const ingLower = ing.toLowerCase();
-            if (!sourceIngredients.includes(ingLower)) {
-                associatedIngredients.add(ingLower);
+      associationRules.forEach(rule => {
+        const allIngredientsInRule = [...rule.antecedents, ...rule.consequents];
+        allIngredientsInRule.forEach(ingredient => {
+            const ingredientLower = ingredient.toLowerCase();
+            if (!sourceIngredients.includes(ingredientLower)) {
+                associatedIngredientsSet.add(ingredientLower);
             }
         });
       });
 
-      const targetIngredients = Array.from(associatedIngredients);
+      const targetIngredientsList = Array.from(associatedIngredientsSet);
 
-      if (targetIngredients.length === 0) {
-        return res.json({ count: 0, data: [] });
+      if (targetIngredientsList.length === 0) {
+        return response.json({ count: 0, data: [] });
       }
 
       const productFilter = {
-        _or: targetIngredients.map(ing => ({
-          ingredients: {
-            ingredient_id: {
-              name: { _icontains: ing }
-            }
-          }
-        })),
-        id: { _neq: productId }
+        _and: [
+          {
+            _or: targetIngredientsList.map(ingredient => ({
+              ingredients: {
+                ingredient_id: {
+                  name: { _icontains: ingredient }
+                }
+              }
+            }))
+          },
+          { id: { _neq: productId } },
+          { category: { _eq: sourceProduct.category } }
+        ]
       };
 
       const recommendedProducts = await productService.readByQuery({
@@ -195,18 +198,72 @@ export default (router, { services, env, exceptions }) => {
         fields: ['*', 'ingredients.ingredient_id.name']
       });
 
-      const finalProducts = filterAndRankProducts(recommendedProducts, targetIngredients, 2);
+      const finalSimilarProducts = filterAndRankProducts(recommendedProducts, targetIngredientsList, 2);
 
-      res.json({
+      response.json({
         source_product: sourceProduct.name,
-        associated_ingredients_found: targetIngredients,
-        count: finalProducts.length,
-        data: finalProducts
+        source_category: sourceProduct.category,
+        associated_ingredients_found: targetIngredientsList,
+        count: finalSimilarProducts.length,
+        data: finalSimilarProducts
       });
 
     } catch (error) {
       console.error("Association Endpoint Error:", error);
-      res.status(500).json({ error: error.message });
+      response.status(500).json({ error: error.message });
     }
+  });
+
+  router.post('/trigger-retrain', async (req, res) => {
+      if (!req.accountability || !req.accountability.admin) {
+          return res.status(403).json({ error: "Forbidden: Admin only." });
+      }
+
+      try {
+          const PYTHON_API_URL = env.PYTHON_API_URL;
+          const responseFromPython = await axios.post(`${PYTHON_API_URL}/retrain`);
+          return res.json(responseFromPython.data);
+      } catch (error) {
+          console.error("Manual Retrain Error:", error.message);
+          return res.status(500).json({ error: "Failed to trigger retraining." });
+      }
+  });
+
+  router.post('/switch-model', async (req, res) => {
+      if (!req.accountability || !req.accountability.admin) {
+          return res.status(403).json({ error: "Forbidden: Admin only." });
+      }
+
+      const { id } = req.body;
+      if (!id) return res.status(400).json({ error: "Missing log ID" });
+
+      try {
+          const logService = new ItemsService('model_training_log', { 
+              schema: req.schema, 
+              accountability: req.accountability 
+          });
+
+          const activeLogs = await logService.readByQuery({
+              filter: { is_active: { _eq: true } },
+              fields: ['id']
+          });
+
+          for (const log of activeLogs) {
+              await logService.updateOne(log.id, { is_active: false });
+          }
+
+          await logService.updateOne(id, { is_active: true });
+
+          const PYTHON_API_URL = env.PYTHON_API_URL;
+          try {
+              await axios.get(`${PYTHON_API_URL}/reload`); 
+          } catch (e) {
+              console.warn("Python reload triggered but failed (ignore if endpoint not exists)");
+          }
+
+          return res.json({ success: true, message: "Model switched successfully" });
+      } catch (error) {
+          return res.status(500).json({ error: error.message });
+      }
   });
 };
