@@ -147,7 +147,7 @@ router.get('/product-for-skin-type', async (request, response) => {
       });
 
       const sourceProduct = await productService.readOne(productId, {
-        fields: ['id', 'name', 'category', 'ingredients.ingredient_id.name']
+        fields: ['id', 'name', 'categories.category_id', 'ingredients.ingredient_id.name']
       });
 
       if (!sourceProduct) {
@@ -172,7 +172,6 @@ router.get('/product-for-skin-type', async (request, response) => {
         associationRules = modelResponse.data || [];
       } catch (error) {
         console.error("Python API Error:", error.message);
-        return response.status(503).json({ error: "Cannot connect to association model." });
       }
 
       if (associationRules.length === 0) {
@@ -197,33 +196,43 @@ router.get('/product-for-skin-type', async (request, response) => {
         return response.json({ count: 0, data: [] });
       }
 
-      const productFilter = {
-        _and: [
-          {
-            _or: targetIngredientsList.map(ingredient => ({
-              ingredients: {
-                ingredient_id: {
-                  name: { _icontains: ingredient }
-                }
+      const sourceCategoryId = sourceProduct.categories?.[0]?.category_id;
+
+      const filterConditions = [
+        {
+          _or: targetIngredientsList.map(ingredient => ({
+            ingredients: {
+              ingredient_id: {
+                name: { _icontains: ingredient }
               }
-            }))
-          },
-          { id: { _neq: productId } },
-          { category: { _eq: sourceProduct.category } }
-        ]
+            }
+          }))
+        },
+        { id: { _neq: productId } }
+      ];
+
+      if (sourceCategoryId) {
+         filterConditions.push({
+             categories: {
+                 category_id: { _eq: sourceCategoryId } 
+             }
+         });
+      }
+
+      const productFilter = {
+        _and: filterConditions
       };
 
       const recommendedProducts = await productService.readByQuery({
         filter: productFilter,
         limit: -1, 
-        fields: ['*', 'ingredients.ingredient_id.name']
+        fields: ['*', 'ingredients.ingredient_id.name', 'categories.category_id.name']
       });
 
       const finalSimilarProducts = filterAndRankProducts(recommendedProducts, targetIngredientsList, 2);
 
       response.json({
         source_product: sourceProduct.name,
-        source_category: sourceProduct.category,
         associated_ingredients_found: targetIngredientsList,
         count: finalSimilarProducts.length,
         data: finalSimilarProducts
