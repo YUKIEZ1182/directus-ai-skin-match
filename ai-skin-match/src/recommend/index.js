@@ -19,7 +19,7 @@ export default (router, { services, env }) => {
     });
 
     const highScorerProducts = rankedProducts.filter(product => product.match_score >= minimumMatch);
-    
+
     let finalResultList = highScorerProducts.length > 0 ? highScorerProducts : rankedProducts.filter(product => product.match_score >= 1);
 
     finalResultList.sort((firstItem, secondItem) => {
@@ -34,7 +34,7 @@ export default (router, { services, env }) => {
     return finalResultList.slice(0, 12);
   };
 
-router.get('/product-for-skin-type', async (request, response) => {
+  router.get('/product-for-skin-type', async (request, response) => {
     
     if (!request.accountability || !request.accountability.user) {
       return response.status(401).json({ error: "Unauthorized: Please log in." });
@@ -79,32 +79,32 @@ router.get('/product-for-skin-type', async (request, response) => {
         return response.json({ count: 0, data: [] });
       }
 
-      const ingredientFilter = {
-        _or: recommendedIngredients.map(ingredient => ({
-          ingredients: {
-            ingredient_id: {
-              name: { _icontains: ingredient }
+      const andConditions = [
+        {
+          _or: recommendedIngredients.map(ingredient => ({
+            ingredients: {
+              ingredient_id: {
+                name: { _icontains: ingredient }
+              }
             }
-          }
-        }))
-      };
-
-      let finalFilter = ingredientFilter;
+          }))
+        },
+        { status: { _eq: 'active' } }
+      ];
 
       if (categoryId && categoryId !== 'home' && categoryId !== 'new') {
-        finalFilter = {
-          _and: [
-            ingredientFilter,
-            { 
-              categories: { 
-                category_id: { 
-                  id: { _eq: categoryId }
-                } 
-              } 
-            }
-          ]
-        };
+        andConditions.push({
+          categories: { 
+            category_id: { 
+              id: { _eq: categoryId }
+            } 
+          }
+        });
       }
+
+      const finalFilter = {
+        _and: andConditions
+      };
 
       const productService = new ItemsService('product', { 
         schema: request.schema, 
@@ -208,7 +208,8 @@ router.get('/product-for-skin-type', async (request, response) => {
             }
           }))
         },
-        { id: { _neq: productId } }
+        { id: { _neq: productId } },
+        { status: { _eq: 'active' } }
       ];
 
       if (sourceCategoryId) {
