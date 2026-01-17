@@ -34,13 +34,15 @@ export default (router, { services, env }) => {
     return finalResultList.slice(0, 12);
   };
 
-  router.get('/product-for-skin-type', async (request, response) => {
+router.get('/product-for-skin-type', async (request, response) => {
     
     if (!request.accountability || !request.accountability.user) {
       return response.status(401).json({ error: "Unauthorized: Please log in." });
     }
 
     try {
+      const categoryId = request.query.category;
+
       const usersService = new ItemsService('directus_users', { 
         schema: request.schema, 
         accountability: request.accountability
@@ -57,7 +59,7 @@ export default (router, { services, env }) => {
         });
       }
 
-      const PYTHON_API_URL = env.PYTHON_API_URL;
+      const PYTHON_API_URL = env.PYTHON_API_URL || 'http://host.docker.internal:5000';
       
       let recommendedIngredients = [];
       try {
@@ -69,6 +71,7 @@ export default (router, { services, env }) => {
 
       } catch (error) {
         console.error("Python Model API Error:", error.message);
+        if (error.response) console.error("Debug:", error.response.data);
         return response.status(503).json({ error: "Cannot connect to recommendation model." });
       }
 
@@ -76,7 +79,7 @@ export default (router, { services, env }) => {
         return response.json({ count: 0, data: [] });
       }
 
-      const productFilter = {
+      const ingredientFilter = {
         _or: recommendedIngredients.map(ingredient => ({
           ingredients: {
             ingredient_id: {
@@ -86,13 +89,30 @@ export default (router, { services, env }) => {
         }))
       };
 
+      let finalFilter = ingredientFilter;
+
+      if (categoryId && categoryId !== 'home' && categoryId !== 'new') {
+        finalFilter = {
+          _and: [
+            ingredientFilter,
+            { 
+              categories: { 
+                category_id: { 
+                  id: { _eq: categoryId }
+                } 
+              } 
+            }
+          ]
+        };
+      }
+
       const productService = new ItemsService('product', { 
         schema: request.schema, 
         accountability: request.accountability 
       });
 
       const products = await productService.readByQuery({
-        filter: productFilter,
+        filter: finalFilter,
         limit: -1,
         fields: ['*', 'ingredients.ingredient_id.name'] 
       });
@@ -101,6 +121,7 @@ export default (router, { services, env }) => {
 
       response.json({
         user_skin_type: currentUser.skin_type,
+        filter_category: categoryId || 'all',
         recommended_ingredients: recommendedIngredients,
         count: finalRecommendedProducts.length,
         data: finalRecommendedProducts
