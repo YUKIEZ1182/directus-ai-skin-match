@@ -1,7 +1,7 @@
 {
   "name": "directus-extension-ai-skin-match",
   "icon": "extension",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "keywords": [
     "directus",
     "directus-extension",
@@ -51,6 +51,11 @@
         "type": "hook",
         "name": "ingredient-processor",
         "source": "src/ingredient-processor/index.js"
+      },
+      {
+        "type": "hook",
+        "name": "auto-default-theme",
+        "source": "src/auto-default-theme/index.js"
       }
     ],
     "host": "^9.26.0"
