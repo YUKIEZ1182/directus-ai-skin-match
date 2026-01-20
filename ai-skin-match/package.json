@@ -1,7 +1,7 @@
 {
   "name": "directus-extension-ai-skin-match",
   "icon": "extension",
-  "version": "1.5.4",
+  "version": "1.6.0",
   "keywords": [
     "directus",
     "directus-extension",
@@ -56,6 +56,11 @@
         "type": "hook",
         "name": "auto-default-theme",
         "source": "src/auto-default-theme/index.js"
+      },
+      {
+        "type": "module",
+        "name": "dashboard",
+        "source": "src/dashboard/index.js"
       }
     ],
     "host": "^9.26.0"
@@ -79,6 +84,8 @@
     "@directus/errors": "^1.0.0",
     "@formkit/vue": "^0.17.3",
     "axios": "^1.13.2",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "papaparse": "^5.5.3",
     "vue-clipboard3": "^2.0.0",
     "vue-i18n": "^9.2.2"
