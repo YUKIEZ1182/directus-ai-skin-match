@@ -20,14 +20,16 @@
                         <div class="visual-title">Skin Type Clustering (การจัดกลุ่มผิว)</div>
                         <div class="img-wrapper">
                             <img :key="selectedLogEntry.id + 'cluster'"
-                                :src="getImageUrl(selectedLogEntry.cluster_visualization)" alt="Clustering Plot" />
+                                :src="getImageUrl(selectedLogEntry.cluster_visualization)" alt="Clustering Plot" 
+                                @click="openZoom(getImageUrl(selectedLogEntry.cluster_visualization))" style="cursor: zoom-in" />
                         </div>
                     </div>
                     <div class="visual-item">
                         <div class="visual-title">Ingredient Association (คู่ส่วนผสมแนะนำ)</div>
                         <div class="img-wrapper">
                             <img :key="selectedLogEntry.id + 'assoc'"
-                                :src="getImageUrl(selectedLogEntry.association_visualization)" alt="Association Plot" />
+                                :src="getImageUrl(selectedLogEntry.association_visualization)" alt="Association Plot" 
+                                @click="openZoom(getImageUrl(selectedLogEntry.association_visualization))" style="cursor: zoom-in" />
                         </div>
                     </div>
                 </div>
@@ -86,12 +88,24 @@
                 </v-table>
             </v-sheet>
         </div>
+
+        <div v-if="zoomedImageUrl" class="image-overlay" @click="closeZoom">
+            <div class="overlay-content" @click.stop>
+                <div ref="panzoomContainer" class="panzoom-wrapper">
+                    <img :src="zoomedImageUrl" class="zoomed-image" />
+                </div>
+                <div class="close-icon-btn" @click="closeZoom">
+                    <v-icon name="close" />
+                </div>
+            </div>
+        </div>
     </private-view>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { useApi } from '@directus/extensions-sdk';
+import panzoom from 'panzoom';
 
 export default {
     setup() {
@@ -100,6 +114,9 @@ export default {
         const selectedLogEntry = ref(null);
         const isProcessing = ref(false);
         const processingId = ref(null);
+        const zoomedImageUrl = ref(null);
+        const panzoomContainer = ref(null);
+        let pz = null;
 
         const tableHeaders = [
             { text: 'สถานะ', value: 'is_active', width: 80, align: 'center' },
@@ -160,9 +177,23 @@ export default {
 
         const formatDate = (d) => d ? new Date(d).toLocaleString('th-TH', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-';
 
+        const openZoom = (url) => {
+            zoomedImageUrl.value = url;
+            nextTick(() => {
+                if (panzoomContainer.value) {
+                    pz = panzoom(panzoomContainer.value, { maxZoom: 5, minZoom: 0.5, bounds: true });
+                }
+            });
+        };
+
+        const closeZoom = () => {
+            if (pz) { pz.dispose(); pz = null; }
+            zoomedImageUrl.value = null;
+        };
+
         onMounted(fetchTrainingLogs);
 
-        return { trainingLogsList, selectedLogEntry, tableHeaders, isProcessing, processingId, startRetrain, handleSetActive, onRowClick, getImageUrl, formatDate };
+        return { trainingLogsList, selectedLogEntry, tableHeaders, isProcessing, processingId, startRetrain, handleSetActive, onRowClick, getImageUrl, formatDate, zoomedImageUrl, panzoomContainer, openZoom, closeZoom };
     },
 };
 </script>
@@ -280,4 +311,19 @@ export default {
     font-weight: bold;
     margin-bottom: 20px;
 }
+
+/* Lightbox Styles */
+.image-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.9); z-index: 2000; display: flex; align-items: center; justify-content: center;
+}
+.overlay-content { position: relative; width: 90%; height: 90%; overflow: hidden; }
+.panzoom-wrapper { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.zoomed-image { max-width: 100%; max-height: 100%; object-fit: contain; }
+.close-icon-btn {
+    position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; 
+    background: rgba(255, 255, 255, 0.2); border-radius: 50%; color: white;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2100;
+}
+.close-icon-btn:hover { background: rgba(255, 255, 255, 0.4); }
 </style>
