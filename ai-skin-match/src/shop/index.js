@@ -35,7 +35,11 @@ export default (router, { services, database }) => {
     }
 
     const userId = req.accountability.user;
-    const { item_ids } = req.body;
+    const { 
+      item_ids, 
+      user_address, 
+      payment_method,
+    } = req.body;
     const todayStr = getYYYYMMDD(new Date());
 
     try {
@@ -108,6 +112,8 @@ export default (router, { services, database }) => {
 
           await orderService.updateOne(targetOrderId, {
             total_price: totalPrice,
+            user_address: user_address,
+            payment_method: payment_method
           });
           await orderDetailService.deleteByQuery({
             filter: { order_id: { _eq: targetOrderId } },
@@ -120,6 +126,8 @@ export default (router, { services, database }) => {
             order_date: todayStr,
             total_price: totalPrice,
             status: "pending",
+            user_address: user_address,
+            payment_method: payment_method
           });
           targetOrderId = typeof result === "object" ? result.id : result;
         }
