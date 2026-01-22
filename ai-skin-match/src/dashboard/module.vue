@@ -135,7 +135,7 @@ const fetchData = async () => {
         const prodRes = await api.get('/items/product', {
             params: {
                 limit: -1,
-                fields: ['stock', 'expiry_date']
+                fields: ['quantity', 'expiry_date']
             }
         });
 
@@ -147,11 +147,11 @@ const fetchData = async () => {
         stats.value.totalProducts = prods.length;
 
         stats.value.lowStock = prods.filter(p =>
-            p.stock > 0 && p.stock < 10
+            p.quantity > 0 && p.quantity < 10
         ).length;
 
         stats.value.outOfStock = prods.filter(p =>
-            p.stock <= 0
+            p.quantity <= 0
         ).length;
 
         stats.value.nearExpiry = prods.filter(p => {
