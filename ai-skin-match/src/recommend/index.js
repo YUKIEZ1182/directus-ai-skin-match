@@ -246,7 +246,7 @@ export default (router, { services, env }) => {
   });
 
   router.post('/trigger-retrain', async (req, res) => {
-      if (!request.accountability || !request.accountability.user) {
+      if (!req.accountability || !req.accountability.user) {
         return response.status(401).json({ error: "Unauthorized: Please log in." });
       }
 
@@ -261,7 +261,7 @@ export default (router, { services, env }) => {
   });
 
   router.post('/switch-model', async (req, res) => {
-      if (!request.accountability || !request.accountability.user) {
+      if (!req.accountability || !req.accountability.user) {
         return response.status(401).json({ error: "Unauthorized: Please log in." });
       }
 
