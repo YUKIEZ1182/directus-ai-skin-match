@@ -246,8 +246,8 @@ export default (router, { services, env }) => {
   });
 
   router.post('/trigger-retrain', async (req, res) => {
-      if (!req.accountability || !req.accountability.admin) {
-          return res.status(403).json({ error: "Forbidden: Admin only." });
+      if (!request.accountability || !request.accountability.user) {
+        return response.status(401).json({ error: "Unauthorized: Please log in." });
       }
 
       try {
@@ -261,8 +261,8 @@ export default (router, { services, env }) => {
   });
 
   router.post('/switch-model', async (req, res) => {
-      if (!req.accountability || !req.accountability.admin) {
-          return res.status(403).json({ error: "Forbidden: Admin only." });
+      if (!request.accountability || !request.accountability.user) {
+        return response.status(401).json({ error: "Unauthorized: Please log in." });
       }
 
       const { id } = req.body;

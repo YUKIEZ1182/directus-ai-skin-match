@@ -1,5 +1,5 @@
 <template>
-    <private-view title="Product Import">
+    <private-view title="นำเข้าข้อมูลผลิตภัณฑ์">
         <div class="import-container">
             <div class="setup-panel">
                 <v-sheet class="main-card">

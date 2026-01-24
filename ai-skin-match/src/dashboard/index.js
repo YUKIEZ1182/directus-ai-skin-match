@@ -2,7 +2,7 @@ import ModuleComponent from './module.vue';
 
 export default {
     id: 'dashboard',
-    name: 'Dashboard',
+    name: 'แดชบอร์ดสรุปภาพรวม',
     icon: 'dashboard',
     routes: [
         {
