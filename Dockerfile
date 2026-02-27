@@ -25,13 +25,9 @@ COPY package.json .
 COPY package-lock.json .
 COPY entrypoint.sh . 
 
-# --- ส่วนที่เพิ่มเข้ามาเพื่อแก้ปัญหาติดตั้ง Sharp บน Alpine ---
-RUN apk update && apk add --no-cache python3 make g++ vips-dev
-# ----------------------------------------------------
-
 # 2. ติดตั้ง Core Dependencies (Directus 9.26.0)
-ENV SHARP_DIST_BASE_URL=https://npmmirror.com/mirrors/sharp-libvips/
-RUN npm install --unsafe-perm=true --allow-root
+# ✨ เพิ่ม --ignore-scripts ตรงนี้ เพื่อข้ามปัญหาการโหลด Sharp 
+RUN npm install --unsafe-perm=true --allow-root --ignore-scripts
 
 # 3. ติดตั้ง Custom Extension TGZ จาก builder stage
 COPY --from=builder /app/ai-skin-match/*.tgz /tmp/
