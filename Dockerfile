@@ -20,24 +20,26 @@ WORKDIR /app
 
 USER root
 
-# 1. คัดลอก Dependencies หลักจาก Root ของโปรเจกต์
+# 1. คัดลอก Dependencies หลัก
 COPY package.json .
 COPY package-lock.json .
 COPY entrypoint.sh . 
 
-# 2. ติดตั้ง Core Dependencies (Directus 9.26.0)
-# ✨ เพิ่ม --ignore-scripts ตรงนี้ เพื่อข้ามปัญหาการโหลด Sharp 
-RUN npm install --unsafe-perm=true --allow-root --ignore-scripts
+# 2. 🛠️ ใส่กล่องเครื่องมือช่าง (สำคัญมาก เพื่อให้สร้าง argon2 และ sharp ได้)
+RUN apk update && apk add --no-cache python3 make g++ vips-dev
 
-# 3. ติดตั้ง Custom Extension TGZ จาก builder stage
+# 3. ติดตั้ง Core Dependencies (เอา --ignore-scripts ออก และไม่ใช้ Mirror ที่พัง)
+RUN npm install --unsafe-perm=true --allow-root
+
+# 4. ติดตั้ง Custom Extension ของคุณ
 COPY --from=builder /app/ai-skin-match/*.tgz /tmp/
 RUN npm install --unsafe-perm=true --allow-root /tmp/*.tgz
 
-# 4. แก้ไขสิทธิ์การเข้าถึงไฟล์ทั้งหมดให้ผู้ใช้ 'node'
+# 5. แก้ไขสิทธิ์การเข้าถึงไฟล์ทั้งหมด
 RUN chown -R node:node /app
 RUN chmod +x ./entrypoint.sh
 
-# 5. สลับกลับไปใช้ผู้ใช้ 'node'
+# 6. สลับกลับไปใช้ผู้ใช้ 'node'
 USER node
 
 EXPOSE 8055
